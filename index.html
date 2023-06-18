@@ -2,11 +2,37 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Simple Form Validation</title>
+  <title>5G Theoretical Throughput Calculator</title>
   <link rel="stylesheet" href="style.css">
 </head>
- <title>5G Theoretical Throughput Calculator</title>
 <body>
- 
+  <div class="container">
+    <h1>5G Theoretical Throughput Calculator</h1>
+    <form action="results.php" method="post">
+      <div class="form-group">
+        <label for="bandwidth">Bandwidth</label>
+        <input type="number" name="bandwidth" id="bandwidth" class="form-control" placeholder="Enter bandwidth in Mbps">
+      </div>
+      <div class="form-group">
+        <label for="modulation">Modulation</label>
+        <select name="modulation" id="modulation" class="form-control">
+          <option value="QPSK">QPSK</option>
+          <option value="QAM16">QAM16</option>
+          <option value="QAM64">QAM64</option>
+          <option value="QAM256">QAM256</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="coding">Coding</label>
+        <select name="coding" id="coding" class="form-control">
+          <option value="1/2">1/2</option>
+          <option value="3/4">3/4</option>
+          <option value="5/6">5/6</option>
+          <option value="7/8">7/8</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Calculate</button>
+    </form>
+  </div>
 </body>
 </html>
