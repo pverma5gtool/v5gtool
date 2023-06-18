@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Network Configuration Form</title>
+  <style>
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    input[type="submit"] {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Network Configuration Form</h1>
+  <form id="networkForm">
+    <div class="form-group">
+      <label for="layer">Number of Layers:</label>
+      <input type="number" id="layer" name="layer" required>
+    </div>
+
+    <div class="form-group">
+      <label for="pushMappingType">Push Mapping Type:</label>
+      <input type="text" id="pushMappingType" name="pushMappingType" required>
+    </div>
+
+    <div class="form-group">
+      <label for="dciFormat">DCI Format:</label>
+      <input type="text" id="dciFormat" name="dciFormat" required>
+    </div>
+
+    <div class="form-group">
+      <label for="freqHopFlag">Frequency Hop Flag:</label>
+      <input type="text" id="freqHopFlag" name="freqHopFlag" required>
+    </div>
+
+    <div class="form-group">
+      <label for="dmrsLength">DMRS Length:</label>
+      <input type="number" id="dmrsLength" name="dmrsLength" required>
+    </div>
+
+    <div class="form-group">
+      <label for="mcsIndex">MCS Index:</label>
+      <input type="number" id="mcsIndex" name="mcsIndex" required>
+    </div>
+
+    <div class="form-group">
+      <label for="numRb">Number of RBs:</label>
+      <input type="number" id="numRb" name="numRb" required>
+    </div>
+
+    <div class="form-group">
+      <label for="modulationScheme">Modulation Scheme:</label>
+      <input type="text" id="modulationScheme" name="modulationScheme" required>
+    </div>
+
+    <input type="submit" value="Submit">
+  </form>
+
+  <script>
+    document.getElementById("networkForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      // Retrieve form field values
+      var layer = document.getElementById("layer").value;
+      var pushMappingType = document.getElementById("pushMappingType").value;
+      var dciFormat = document.getElementById("dciFormat").value;
+      var freqHopFlag = document.getElementById("freqHopFlag").value;
+      var dmrsLength = document.getElementById("dmrsLength").value;
+      var mcsIndex = document.getElementById("mcsIndex").value;
+      var numRb = document.getElementById("numRb").value;
+      var modulationScheme = document.getElementById("modulationScheme").value;
+
+      // Display the results
+      alert("Number of Layers: " + layer +
+            "\nPush Mapping Type: "
