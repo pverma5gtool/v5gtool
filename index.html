@@ -1,8 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Network Configuration Form</title>
+  <title>Verana Throughput Calculator</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      text-align: center;
+    }
+
+    .form-section {
+      flex-basis: 50%;
+      background-color: #fff;
+      padding: 20px;
+      margin: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
     .form-group {
       margin-bottom: 20px;
     }
@@ -11,6 +33,17 @@
       display: block;
       font-weight: bold;
       margin-bottom: 5px;
+      color: #666;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
     }
 
     input[type="submit"] {
@@ -18,70 +51,553 @@
       background-color: #4CAF50;
       color: white;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    .error-message {
+      color: red;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .form-section {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Verana Throughput calculaton Form</h1>
-  <form id="networkForm">
-    <div class="form-group">
-      <label for="layer">Number of Layers:</label>
-      <input type="number" id="layer" name="layer" required>
-    </div>
+  <h1 style="text-align: center;">Verana Throughput Calculator</h1>
+  <div class="container">
+    <div class="form-section">
+      <h2>Downlink Configuration</h2>
+      <form id="downlinkForm">
+        <div class="form-group">
+          <label for="layer">Number of Layers:</label>
+          <input type="number" id="layer" name="layer" min="1" max="2" required>
+        </div>
 
-    <div class="form-group">
-      <label for="pushMappingType">Push Mapping Type:</label>
-      <input type="text" id="pushMappingType" name="pushMappingType" required>
-    </div>
+        <div class="form-group">
+          <label for="pushMappingType">PDSCH Mapping Type:</label>
+          <select id="pushMappingType" name="pushMappingType" required>
+            <option value="A">A</option>
+            <option value="B">B</option>
+          </select>
+        </div>
 
-    <div class="form-group">
-      <label for="dciFormat">DCI Format:</label>
-      <input type="text" id="dciFormat" name="dciFormat" required>
-    </div>
+        <div class="form-group">
+          <label for="dciFormat">DCI Format:</label>
+          <select id="dciFormat" name="dciFormat" required>
+            <option value="10">10</option>
+            <option value="11">11</option>
+          </select>
+        </div>
 
-    <div class="form-group">
-      <label for="freqHopFlag">Frequency Hop Flag:</label>
-      <input type="text" id="freqHopFlag" name="freqHopFlag" required>
-    </div>
+        <div class="form-group">
+          <label for="dmrsLength">DMRS Length:</label>
+          <input type="number" id="dmrsLength" name="dmrsLength" min="1" max="2" required>
+        </div>
 
-    <div class="form-group">
-      <label for="dmrsLength">DMRS Length:</label>
-      <input type="number" id="dmrsLength" name="dmrsLength" required>
-    </div>
+        <div class="form-group">
+          <label for="mcsIndex">MCS Index:</label>
+          <input type="number" id="mcsIndex" name="mcsIndex" min="0" max="28" required>
+        </div>
 
-    <div class="form-group">
-      <label for="mcsIndex">MCS Index:</label>
-      <input type="number" id="mcsIndex" name="mcsIndex" required>
-    </div>
+        <div class="form-group">
+          <label for="numRb">Number of RBs:</label>
+          <input type="number" id="numRb" name="numRb" min="1" max="66" required>
+        </div>
 
-    <div class="form-group">
-      <label for="numRb">Number of RBs:</label>
-      <input type="number" id="numRb" name="numRb" required>
-    </div>
+        <div class="form-group">
+          <label for="modulationScheme">Modulation Scheme:</label>
+          <select id="modulationScheme" name="modulationScheme" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+        </div>
 
-    <div class="form-group">
-      <label for="modulationScheme">Modulation Scheme:</label>
-      <input type="text" id="modulationScheme" name="modulationScheme" required>
+        <input type="submit" value="Calculate">
+      </form>
+      <div id="downlinkResult" class="result"></div>
     </div>
+    <div class="form-section">
+      <h2>Uplink Configuration</h2>
+      <form id="uplinkForm">
+        <div class="form-group">
+          <label for="uplinkLayer">Number of Layers:</label>
+          <input type="number" id="uplinkLayer" name="uplinkLayer" min="1" max="2" required>
+        </div>
 
-    <input type="submit" value="Submit">
-  </form>
+        <div class="form-group">
+          <label for="uplinkMappingType">PUSCH Mapping Type:</label>
+          <select id="uplinkMappingType" name="uplinkMappingType" required>
+            <option value="A">A</option>
+            <option value="B">B</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="uplinkDciFormat">DCI Format:</label>
+          <select id="uplinkDciFormat" name="uplinkDciFormat" required>
+            <option value="00">00</option>
+            <option value="01">01</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="uplinkDmrsLength">DMRS Length:</label>
+          <input type="number" id="uplinkDmrsLength" name="uplinkDmrsLength" min="1" max="2" required>
+        </div>
+
+        <div class="form-group">
+          <label for="uplinkMcsIndex">MCS Index:</label>
+          <input type="number" id="uplinkMcsIndex" name="uplinkMcsIndex" min="0" max="28" required>
+        </div>
+
+        <div class="form-group">
+          <label for="uplinkNumRb">Number of RBs:</label>
+          <input type="number" id="uplinkNumRb" name="uplinkNumRb" min="1" max="66" required>
+        </div>
+
+        <div class="form-group">
+          <label for="uplinkModulationScheme">Modulation Scheme:</label>
+          <select id="uplinkModulationScheme" name="uplinkModulationScheme" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="uplinkFreqHopFlag">Frequency Hop Flag:</label>
+          <input type="text" id="uplinkFreqHopFlag" name="uplinkFreqHopFlag" value="Disabled" disabled>
+        </div>
+
+        <input type="submit" value="Calculate">
+      </form>
+      <div id="uplinkResult" class="result"></div>
+    </div>
+  </div>
 
   <script>
-    document.getElementById("networkForm").addEventListener("submit", function(event) {
+    function calculateDownlinkThroughput() {
+      const layer = parseInt(document.getElementById('layer').value);
+      const mappingType = document.getElementById('pushMappingType').value;
+      const dciFormat = document.getElementById('dciFormat').value;
+      const dmrsLength = parseInt(document.getElementById('dmrsLength').value);
+      const mcsIndex = parseInt(document.getElementById('mcsIndex').value);
+      const numRb = parseInt(document.getElementById('numRb').value);
+      const modulationScheme = parseInt(document.getElementById('modulationScheme').value);
+
+      const throughput = layer * mappingType * dciFormat * dmrsLength * mcsIndex * numRb * modulationScheme;
+      document.getElementById('downlinkResult').innerText = `Downlink Throughput: ${throughput}`;
+    }
+
+const TBS_TableA = [
+  [0, 2, 120, 0.2344],
+  [1, 2, 157, 0.3066],
+  [2, 2, 193, 0.3770],
+  [3, 2, 251, 0.4902],
+  [4, 2, 308, 0.6016],
+  [5, 2, 379, 0.7402],
+  [6, 2, 449, 0.8770],
+  [7, 2, 526, 1.0273],
+  [8, 2, 602, 1.1758],
+  [9, 2, 679, 1.3262],
+  [10, 4, 340, 1.3281],
+  [11, 4, 378, 1.4766],
+  [12, 4, 434, 1.6953],
+  [13, 4, 490, 1.9141],
+  [14, 4, 553, 2.1602],
+  [15, 4, 616, 2.4063],
+  [16, 4, 658, 2.5703],
+  [17, 6, 438, 2.5664],
+  [18, 6, 466, 2.7305],
+  [19, 6, 517, 3.0293],
+  [20, 6, 567, 3.3223],
+  [21, 6, 616, 3.6094],
+  [22, 6, 666, 3.9023],
+  [23, 6, 719, 4.2129],
+  [24, 6, 772, 4.5234],
+  [25, 6, 822, 4.8164],
+  [26, 6, 873, 5.1152],
+  [27, 6, 910, 5.3320],
+  [28, 6, 948, 5.5547]
+];
+
+const TBS_TableB = [
+  [0, 2, 120, 0.2344],
+  [1, 2, 193, 0.377],
+  [2, 2, 308, 0.6016],
+  [3, 2, 449, 0.877],
+  [4, 2, 602, 1.1758],
+  [5, 4, 378, 1.4766],
+  [6, 4, 434, 1.6953],
+  [7, 4, 490, 1.9141],
+  [8, 4, 553, 2.1602],
+  [9, 4, 616, 2.4063],
+  [10, 4, 658, 2.5703],
+  [11, 6, 466, 2.7305],
+  [12, 6, 517, 3.0293],
+  [13, 6, 567, 3.3223],
+  [14, 6, 616, 3.6094],
+  [15, 6, 666, 3.9023],
+  [16, 6, 719, 4.2129],
+  [17, 6, 772, 4.5234],
+  [18, 6, 822, 4.8164],
+  [19, 6, 873, 5.1152],
+  [20, 8, 682.5, 5.332],
+  [21, 8, 711, 5.5547],
+  [22, 8, 754, 5.8906],
+  [23, 8, 797, 6.2266],
+  [24, 8, 841, 6.5703],
+  [25, 8, 885, 6.9141],
+  [26, 8, 916.5, 7.1602],
+  [27, 8, 948, 7.4063]
+];
+
+const TBArray = [
+  [1, 24],
+  [2, 32],
+  [3, 40],
+  [4, 48],
+  [5, 56],
+  [6, 64],
+  [7, 72],
+  [8, 80],
+  [9, 88],
+  [10, 96],
+  [11, 104],
+  [12, 112],
+  [13, 120],
+  [14, 128],
+  [15, 136],
+  [16, 144],
+  [17, 152],
+  [18, 160],
+  [19, 168],
+  [20, 176],
+  [21, 184],
+  [22, 192],
+  [23, 208],
+  [24, 224],
+  [25, 240],
+  [26, 256],
+  [27, 272],
+  [28, 288],
+  [29, 304],
+  [30, 320],
+  [31, 336],
+  [32, 352],
+  [33, 368],
+  [34, 384],
+  [35, 408],
+  [36, 432],
+  [37, 456],
+  [38, 480],
+  [39, 504],
+  [40, 528],
+  [41, 552],
+  [42, 576],
+  [43, 608],
+  [44, 640],
+  [45, 672],
+  [46, 704],
+  [47, 736],
+  [48, 768],
+  [49, 808],
+  [50, 848],
+  [51, 888],
+  [52, 928],
+  [53, 984],
+  [54, 1032],
+  [55, 1064],
+  [56, 1128],
+  [57, 1160],
+  [58, 1192],
+  [59, 1224],
+  [60, 1256],
+  [61, 1288],
+  [62, 1320],
+  [63, 1352],
+  [64, 1416],
+  [65, 1480],
+  [66, 1544],
+  [67, 1608],
+  [68, 1672],
+  [69, 1736],
+  [70, 1800],
+  [71, 1864],
+  [72, 1928],
+  [73, 2024],
+  [74, 2088],
+  [75, 2152],
+  [76, 2216],
+  [77, 2280],
+  [78, 2408],
+  [79, 2472],
+  [80, 2536],
+  [81, 2600],
+  [82, 2664],
+  [83, 2728],
+  [84, 2792],
+  [85, 2856],
+  [86, 2976],
+  [87, 3104],
+  [88, 3240],
+  [89, 3368],
+  [90, 3496],
+  [91, 3624],
+  [92, 3752],
+  [93, 3824]
+];
+
+function determineTBS(Ninfo) {
+   let tbs_p = 0;
+  let low = 0,
+    high = 92,
+    mid = 0;
+  let tbHigh, tbLow, tbMid, tbMibLessThanOne;
+  tbHigh = TBArray[high][1];
+  tbLow = TBArray[low][1];
+
+  if (Ninfo <= tbLow) {
+    tbs_p = tbLow;
+  } else if (Ninfo >= tbHigh) {
+    tbs_p = tbHigh;
+  } else {
+    while (low <= high) {
+      mid = (low + high) >> 1;
+      tbMid = TBArray[mid][1];
+
+      if (tbMid < Ninfo) {
+        low = mid + 1;
+      } else if (tbMid > Ninfo) {
+        tbMibLessThanOne = TBArray[mid - 1][1];
+        if (tbMibLessThanOne <= Ninfo) {
+          if (tbMibLessThanOne === Ninfo) {
+            tbs_p = tbMibLessThanOne;
+          } else {
+            tbs_p = TBArray[mid][1];
+          }
+          break;
+        } else {
+          high = mid - 1;
+        }
+      } else if (tbMid === Ninfo) {
+        tbs_p = TBArray[mid][1];
+        break;
+      }
+      if (low === high) {
+        tbs_p = TBArray[low][1];
+        break;
+      }
+    }
+  }
+  
+  if (tbs_p === 0) {
+    console.error(`TBS ${tbs_p} Ninfo ${Ninfo} low ${low} high ${high} mid ${mid}`);
+    process.exit(1);
+  }
+  return tbs_p;
+}
+
+function calculateTransBlockQAM(num_res_per_prb, num_layer, mcs, prb, qam_val) {
+  let mcsIndex = 0;
+  let prbIndex = 0;
+  let R = 0;
+  let Nre;
+  let numLayer = 0;
+  let Ninfo = 0;
+  let Ninfo1;
+
+  let n, Cprime;
+  let temp;
+  let temp1, tbs;
+
+  Nre = num_res_per_prb;
+  numLayer = num_layer;
+  mcsIndex = mcs;
+  prbIndex = prb;
+  if (qam_val === 0) { // MCS_TABLE_64_QAM
+    R = TBS_TableA[mcsIndex][2] / 1024.0;  
+    Ninfo = Nre * R * numLayer * TBS_TableA[mcsIndex][1] * prbIndex;
+
+  } else {
+    R = TBS_TableB[mcsIndex][2] / 1024.0;
+    Ninfo = Nre * R * numLayer * TBS_TableB[mcsIndex][1] * prbIndex;
+  }
+
+  if (Ninfo <= 3824) 
+  {
+    if (Math.log2(Ninfo) < 6) {
+      n = 3;
+    } else {
+      temp = Math.floor(Math.log2(Ninfo)) - 6;
+      n = temp > 3 ? temp : 3;
+    }
+
+    temp = Math.floor(Ninfo >> n);
+    temp1 = temp << n;
+    Ninfo1 = temp1 > 24 ? temp1 : 24;
+
+    let tbs1 = 0;
+    tbs1 = determineTBS(Ninfo1);
+
+    return tbs1 / 8;
+  } else 
+  {
+ 
+    let temp3 = 0,
+      temp4 = 0;
+    let a = 0;
+    let temp5 = 0,
+      temp6 = 0;
+    tbs = 0;
+    temp3 = Ninfo - 24;
+	
+    if (Math.floor(Math.log2(temp3)) > 5) {
+      n = Math.floor(Math.log2(temp3)) - 5;
+    } else {
+      n = 0;
+    }
+    a = 1 << n;
+    temp = Math.round(temp3 / a);
+    temp1 = temp << n;
+    Ninfo1 = temp1 > 3840 ? temp1 : 3840;
+    temp4 = Ninfo1 + 24;
+
+    if (R <= 0.25) {
+      temp5 = temp4 / 3816;
+      Cprime = Math.ceil(temp5);
+      temp6 = temp4 / (8 * Cprime);
+      temp = Math.ceil(temp6);
+      tbs = 8 * Cprime * temp - 24;
+    } else {
+      if (Ninfo1 > 8424) {
+        temp5 = temp4 / 8424;
+        Cprime = Math.ceil(temp5);
+        temp6 = temp4 / (8 * Cprime);
+        temp = Math.ceil(temp6);
+        tbs = 8 * Cprime * temp - 24;
+      } else {
+        temp5 = temp4 / 8;
+        temp = Math.ceil(temp5);
+        tbs = 8 * temp - 24;
+      }
+    }
+
+    return tbs / 8;
+  }
+}
+
+
+function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_flag) {
+  const MAX_NUM_SYMBOL = 14;
+  const MAX_DMRS_POS = 4;
+ 
+  // Define the struct type
+  function pusch_dmrs_add_pos_symbols_t() {
+    this.num_add_pos_sym = new Array(MAX_DMRS_POS);
+  }
+
+  // Create an array of pusch_dmrs_add_pos_symbols_t objects
+  const g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA = new Array(MAX_NUM_SYMBOL);
+  for (let i = 0; i < MAX_NUM_SYMBOL; i++) {
+    g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[i] = new pusch_dmrs_add_pos_symbols_t();
+    for (let j = 0; j < MAX_DMRS_POS; j++) {
+      g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[i].num_add_pos_sym[j] = 0;
+    }
+  }
+
+  // Set the initial values based on the provided initialization values
+  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[7].num_add_pos_sym = [0, 1, 1, 1];
+  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[8].num_add_pos_sym = [0, 1, 1, 1];
+  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[9].num_add_pos_sym = [0, 1, 2, 2];
+  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[10].num_add_pos_sym = [0, 1, 2, 2];
+  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[11].num_add_pos_sym = [0, 1, 2, 3];
+  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[12].num_add_pos_sym = [0, 1, 2, 3];
+  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[13].num_add_pos_sym = [0, 1, 2, 3];
+
+  let dmrs_additional_position;
+
+  if (dci_format == 00) {
+
+    switch (pusch_mapping_type.trim()) {
+      case "A":   
+        //if (freq_hop_flag == 'Disabled') {
+		if (freq_hop_flag == 0) {
+          dmrs_additional_position = 2;
+        } else {
+          dmrs_additional_position = 1;
+        }
+        return g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[symbol_length - 1].num_add_pos_sym[dmrs_additional_position];
+
+      case "B":
+        // Handle case B (code not provided)
+        break;
+    }
+  } else if (dci_format == 01) {
+    // Handle dci_format 01 (code not provided)
+  }
+
+  // Default case when no matching conditions are met
+  return null;
+}
+
+
+function calculateUplinkThroughput() {
+  let uplinkLayer = parseInt(document.getElementById('uplinkLayer').value);
+  const uplinkMappingType = document.getElementById('uplinkMappingType').value;
+  const uplinkDciFormat = document.getElementById('uplinkDciFormat').value;
+  const uplinkDmrsLength = parseInt(document.getElementById('uplinkDmrsLength').value);
+  const uplinkMcsIndex = parseInt(document.getElementById('uplinkMcsIndex').value);
+  const uplinkNumRb = parseInt(document.getElementById('uplinkNumRb').value);
+  const uplinkModulationScheme = parseInt(document.getElementById('uplinkModulationScheme').value);
+
+  if (uplinkDciFormat == 00) {
+    uplinkLayer = 1;
+  }
+  const symbol_length = 12;
+  
+  const num_dmrs_add_pos_in_slot_p = get_dmrs_info(symbol_length, uplinkDciFormat, uplinkMappingType.trim(),0);
+  const ndmrs = (num_dmrs_add_pos_in_slot_p + 1) * 2 * 6;
+  
+  const N_overhead = 6;
+  const num_REs_per_prb = (symbol_length * 12) - ndmrs - N_overhead;
+  
+  let data_rate;
+  
+  if (uplinkModulationScheme === 1) {
+    data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 0);
+  } else {
+    data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 1);
+  }
+  
+  const uplinkThroughput = (data_rate * 16 * 100 *8)/1000000; // Assuming Mbps unit
+  
+  document.getElementById('uplinkResult').innerText = `Uplink Throughput: ${uplinkThroughput} Mbps`;
+}
+
+
+    document.getElementById('downlinkForm').addEventListener('submit', function (event) {
       event.preventDefault();
+      calculateDownlinkThroughput();
+    });
 
-      // Retrieve form field values
-      var layer = document.getElementById("layer").value;
-      var pushMappingType = document.getElementById("pushMappingType").value;
-      var dciFormat = document.getElementById("dciFormat").value;
-      var freqHopFlag = document.getElementById("freqHopFlag").value;
-      var dmrsLength = document.getElementById("dmrsLength").value;
-      var mcsIndex = document.getElementById("mcsIndex").value;
-      var numRb = document.getElementById("numRb").value;
-      var modulationScheme = document.getElementById("modulationScheme").value;
-
-      // Display the results
-      alert("Number of Layers: " + layer +
-            "\nPush Mapping Type: "
+    document.getElementById('uplinkForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      calculateUplinkThroughput();
+    });
+  </script>
+</body>
+</html>
