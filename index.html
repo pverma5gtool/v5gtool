@@ -104,10 +104,13 @@
         </div>
 
         <div class="form-group">
-          <label for="dmrsLength">DMRS Length:</label>
-          <input type="number" id="dmrsLength" name="dmrsLength" min="1" max="2" required>
+          <label for="dlota_or_vpal">IS OTA?</label>
+		  <select id="dlota_or_vpal" name="dlota_or_vpal" required>
+            <option value="YES">YES</option>
+            <option value="NO">NO</option>
+          </select>
         </div>
-
+		
         <div class="form-group">
           <label for="mcsIndex">MCS Index:</label>
           <input type="number" id="mcsIndex" name="mcsIndex" min="0" max="28" required>
@@ -135,7 +138,7 @@
       <form id="uplinkForm">
         <div class="form-group">
           <label for="uplinkLayer">Number of Layers:</label>
-          <input type="number" id="uplinkLayer" name="uplinkLayer" min="1" max="2" required>
+          <input type="number" id="uplinkLayer" name="uplinkLayer" min="1" max="2" value="1" required>
         </div>
 
         <div class="form-group">
@@ -155,20 +158,36 @@
         </div>
 
         <div class="form-group">
-          <label for="uplinkDmrsLength">DMRS Length:</label>
-          <input type="number" id="uplinkDmrsLength" name="uplinkDmrsLength" min="1" max="2" required>
+          <label for="ota_or_vpal">IS OTA</label>
+		  <select id="ota_or_vpal" name="ota_or_vpal" required>
+            <option value="YES">YES</option>
+            <option value="NO">NO</option>
+          </select>
         </div>
 
         <div class="form-group">
+          <label for="prachCfgIndex">PRACHCFGINDEX</label>
+		  <select id="prachCfgIndex" name="prachCfgIndex" required>
+            <option value="180">180</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+		
+        <div class="form-group">
           <label for="uplinkMcsIndex">MCS Index:</label>
-          <input type="number" id="uplinkMcsIndex" name="uplinkMcsIndex" min="0" max="28" required>
+          <input type="number" id="uplinkMcsIndex" name="uplinkMcsIndex" min="0" max="28" value="28" required>
         </div>
 
         <div class="form-group">
           <label for="uplinkNumRb">Number of RBs:</label>
-          <input type="number" id="uplinkNumRb" name="uplinkNumRb" min="1" max="66" required>
+          <input type="number" id="uplinkNumRb" name="uplinkNumRb" min="1" max="66"  value="66" required>
         </div>
 
+        <div class="form-group">
+          <label for="ulnumuser">Number of UE:</label>
+          <input type="number" id="ulnumuser" name="ulnumuser" min="1" max="32"  value="1" required>
+       </div>
+		
         <div class="form-group">
           <label for="uplinkModulationScheme">Modulation Scheme:</label>
           <select id="uplinkModulationScheme" name="uplinkModulationScheme" required>
@@ -362,231 +381,252 @@ const TBArray = [
 ];
 
 function determineTBS(Ninfo) {
-   let tbs_p = 0;
-  let low = 0,
-    high = 92,
-    mid = 0;
-  let tbHigh, tbLow, tbMid, tbMibLessThanOne;
-  tbHigh = TBArray[high][1];
-  tbLow = TBArray[low][1];
+    let tbs_p = 0;
+    let low = 0,
+        high = 92,
+        mid = 0;
+    let tbHigh, tbLow, tbMid, tbMibLessThanOne;
+    tbHigh = TBArray[high][1];
+    tbLow = TBArray[low][1];
 
-  if (Ninfo <= tbLow) {
-    tbs_p = tbLow;
-  } else if (Ninfo >= tbHigh) {
-    tbs_p = tbHigh;
-  } else {
-    while (low <= high) {
-      mid = (low + high) >> 1;
-      tbMid = TBArray[mid][1];
+    if (Ninfo <= tbLow) {
+        tbs_p = tbLow;
+    } else if (Ninfo >= tbHigh) {
+        tbs_p = tbHigh;
+    } else {
+        while (low <= high) {
+            mid = (low + high) >> 1;
+            tbMid = TBArray[mid][1];
 
-      if (tbMid < Ninfo) {
-        low = mid + 1;
-      } else if (tbMid > Ninfo) {
-        tbMibLessThanOne = TBArray[mid - 1][1];
-        if (tbMibLessThanOne <= Ninfo) {
-          if (tbMibLessThanOne === Ninfo) {
-            tbs_p = tbMibLessThanOne;
-          } else {
-            tbs_p = TBArray[mid][1];
-          }
-          break;
-        } else {
-          high = mid - 1;
+            if (tbMid < Ninfo) {
+                low = mid + 1;
+            } else if (tbMid > Ninfo) {
+                tbMibLessThanOne = TBArray[mid - 1][1];
+                if (tbMibLessThanOne <= Ninfo) {
+                    if (tbMibLessThanOne === Ninfo) {
+                        tbs_p = tbMibLessThanOne;
+                    } else {
+                        tbs_p = TBArray[mid][1];
+                    }
+                    break;
+                } else {
+                    high = mid - 1;
+                }
+            } else if (tbMid === Ninfo) {
+                tbs_p = TBArray[mid][1];
+                break;
+            }
+            if (low === high) {
+                tbs_p = TBArray[low][1];
+                break;
+            }
         }
-      } else if (tbMid === Ninfo) {
-        tbs_p = TBArray[mid][1];
-        break;
-      }
-      if (low === high) {
-        tbs_p = TBArray[low][1];
-        break;
-      }
     }
-  }
-  
-  if (tbs_p === 0) {
-    console.error(`TBS ${tbs_p} Ninfo ${Ninfo} low ${low} high ${high} mid ${mid}`);
-    process.exit(1);
-  }
-  return tbs_p;
+
+    if (tbs_p === 0) {
+        console.error(`TBS ${tbs_p} Ninfo ${Ninfo} low ${low} high ${high} mid ${mid}`);
+        process.exit(1);
+    }
+    return tbs_p;
 }
 
 function calculateTransBlockQAM(num_res_per_prb, num_layer, mcs, prb, qam_val) {
-  let mcsIndex = 0;
-  let prbIndex = 0;
-  let R = 0;
-  let Nre;
-  let numLayer = 0;
-  let Ninfo = 0;
-  let Ninfo1;
+    let mcsIndex = 0;
+    let prbIndex = 0;
+    let R = 0;
+    let Nre;
+    let numLayer = 0;
+    let Ninfo = 0;
+    let Ninfo1;
 
-  let n, Cprime;
-  let temp;
-  let temp1, tbs;
+    let n, Cprime;
+    let temp;
+    let temp1, tbs;
 
-  Nre = num_res_per_prb;
-  numLayer = num_layer;
-  mcsIndex = mcs;
-  prbIndex = prb;
-  if (qam_val === 0) { // MCS_TABLE_64_QAM
-    R = TBS_TableA[mcsIndex][2] / 1024.0;  
-    Ninfo = Nre * R * numLayer * TBS_TableA[mcsIndex][1] * prbIndex;
+    Nre = num_res_per_prb;
+    numLayer = num_layer;
+    mcsIndex = mcs;
+    prbIndex = prb;
+    if (qam_val === 0) { // MCS_TABLE_64_QAM
+        R = TBS_TableA[mcsIndex][2] / 1024.0;
+        Ninfo = Nre * R * numLayer * TBS_TableA[mcsIndex][1] * prbIndex;
 
-  } else {
-    R = TBS_TableB[mcsIndex][2] / 1024.0;
-    Ninfo = Nre * R * numLayer * TBS_TableB[mcsIndex][1] * prbIndex;
-  }
-
-  if (Ninfo <= 3824) 
-  {
-    if (Math.log2(Ninfo) < 6) {
-      n = 3;
     } else {
-      temp = Math.floor(Math.log2(Ninfo)) - 6;
-      n = temp > 3 ? temp : 3;
+        R = TBS_TableB[mcsIndex][2] / 1024.0;
+        Ninfo = Nre * R * numLayer * TBS_TableB[mcsIndex][1] * prbIndex;
     }
 
-    temp = Math.floor(Ninfo >> n);
-    temp1 = temp << n;
-    Ninfo1 = temp1 > 24 ? temp1 : 24;
+    if (Ninfo <= 3824)
+    {
+        if (Math.log2(Ninfo) < 6) {
+            n = 3;
+        } else {
+            temp = Math.floor(Math.log2(Ninfo)) - 6;
+            n = temp > 3 ? temp : 3;
+        }
 
-    let tbs1 = 0;
-    tbs1 = determineTBS(Ninfo1);
+        temp = Math.floor(Ninfo >> n);
+        temp1 = temp << n;
+        Ninfo1 = temp1 > 24 ? temp1 : 24;
 
-    return tbs1 / 8;
-  } else 
-  {
- 
-    let temp3 = 0,
-      temp4 = 0;
-    let a = 0;
-    let temp5 = 0,
-      temp6 = 0;
-    tbs = 0;
-    temp3 = Ninfo - 24;
-	
-    if (Math.floor(Math.log2(temp3)) > 5) {
-      n = Math.floor(Math.log2(temp3)) - 5;
-    } else {
-      n = 0;
+        let tbs1 = 0;
+        tbs1 = determineTBS(Ninfo1);
+
+        return tbs1 / 8;
+    } else
+    {
+
+        let temp3 = 0,
+            temp4 = 0;
+        let a = 0;
+        let temp5 = 0,
+            temp6 = 0;
+        tbs = 0;
+        temp3 = Ninfo - 24;
+
+        if (Math.floor(Math.log2(temp3)) > 5) {
+            n = Math.floor(Math.log2(temp3)) - 5;
+        } else {
+            n = 0;
+        }
+        a = 1 << n;
+        temp = Math.round(temp3 / a);
+        temp1 = temp << n;
+        Ninfo1 = temp1 > 3840 ? temp1 : 3840;
+        temp4 = Ninfo1 + 24;
+
+        if (R <= 0.25) {
+            temp5 = temp4 / 3816;
+            Cprime = Math.ceil(temp5);
+            temp6 = temp4 / (8 * Cprime);
+            temp = Math.ceil(temp6);
+            tbs = 8 * Cprime * temp - 24;
+        } else {
+            if (Ninfo1 > 8424) {
+                temp5 = temp4 / 8424;
+                Cprime = Math.ceil(temp5);
+                temp6 = temp4 / (8 * Cprime);
+                temp = Math.ceil(temp6);
+                tbs = 8 * Cprime * temp - 24;
+            } else {
+                temp5 = temp4 / 8;
+                temp = Math.ceil(temp5);
+                tbs = 8 * temp - 24;
+            }
+        }
+
+        return tbs / 8;
     }
-    a = 1 << n;
-    temp = Math.round(temp3 / a);
-    temp1 = temp << n;
-    Ninfo1 = temp1 > 3840 ? temp1 : 3840;
-    temp4 = Ninfo1 + 24;
-
-    if (R <= 0.25) {
-      temp5 = temp4 / 3816;
-      Cprime = Math.ceil(temp5);
-      temp6 = temp4 / (8 * Cprime);
-      temp = Math.ceil(temp6);
-      tbs = 8 * Cprime * temp - 24;
-    } else {
-      if (Ninfo1 > 8424) {
-        temp5 = temp4 / 8424;
-        Cprime = Math.ceil(temp5);
-        temp6 = temp4 / (8 * Cprime);
-        temp = Math.ceil(temp6);
-        tbs = 8 * Cprime * temp - 24;
-      } else {
-        temp5 = temp4 / 8;
-        temp = Math.ceil(temp5);
-        tbs = 8 * temp - 24;
-      }
-    }
-
-    return tbs / 8;
-  }
 }
 
 
 function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_flag) {
-  const MAX_NUM_SYMBOL = 14;
-  const MAX_DMRS_POS = 4;
- 
-  // Define the struct type
-  function pusch_dmrs_add_pos_symbols_t() {
-    this.num_add_pos_sym = new Array(MAX_DMRS_POS);
-  }
+    const MAX_NUM_SYMBOL = 14;
+    const MAX_DMRS_POS = 4;
 
-  // Create an array of pusch_dmrs_add_pos_symbols_t objects
-  const g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA = new Array(MAX_NUM_SYMBOL);
-  for (let i = 0; i < MAX_NUM_SYMBOL; i++) {
-    g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[i] = new pusch_dmrs_add_pos_symbols_t();
-    for (let j = 0; j < MAX_DMRS_POS; j++) {
-      g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[i].num_add_pos_sym[j] = 0;
+    // Define the struct type
+    function pusch_dmrs_add_pos_symbols_t() {
+        this.num_add_pos_sym = new Array(MAX_DMRS_POS);
     }
-  }
-
-  // Set the initial values based on the provided initialization values
-  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[7].num_add_pos_sym = [0, 1, 1, 1];
-  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[8].num_add_pos_sym = [0, 1, 1, 1];
-  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[9].num_add_pos_sym = [0, 1, 2, 2];
-  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[10].num_add_pos_sym = [0, 1, 2, 2];
-  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[11].num_add_pos_sym = [0, 1, 2, 3];
-  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[12].num_add_pos_sym = [0, 1, 2, 3];
-  g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[13].num_add_pos_sym = [0, 1, 2, 3];
-
-  let dmrs_additional_position;
-
-  if (dci_format == 00) {
-
-    switch (pusch_mapping_type.trim()) {
-      case "A":   
-        //if (freq_hop_flag == 'Disabled') {
-		if (freq_hop_flag == 0) {
-          dmrs_additional_position = 2;
-        } else {
-          dmrs_additional_position = 1;
+    // Create an array of pusch_dmrs_add_pos_symbols_t objects
+    const g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA = new Array(MAX_NUM_SYMBOL);
+    for (let i = 0; i < MAX_NUM_SYMBOL; i++) {
+        g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[i] = new pusch_dmrs_add_pos_symbols_t();
+        for (let j = 0; j < MAX_DMRS_POS; j++) {
+            g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[i].num_add_pos_sym[j] = 0;
         }
-        return g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[symbol_length - 1].num_add_pos_sym[dmrs_additional_position];
-
-      case "B":
-        // Handle case B (code not provided)
-        break;
     }
-  } else if (dci_format == 01) {
-    // Handle dci_format 01 (code not provided)
-  }
 
-  // Default case when no matching conditions are met
-  return null;
-}
+    // Set the initial values based on the provided initialization values
+    g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[7].num_add_pos_sym = [0, 1, 1, 1];
+    g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[8].num_add_pos_sym = [0, 1, 1, 1];
+    g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[9].num_add_pos_sym = [0, 1, 2, 2];
+    g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[10].num_add_pos_sym = [0, 1, 2, 2];
+    g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[11].num_add_pos_sym = [0, 1, 2, 3];
+    g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[12].num_add_pos_sym = [0, 1, 2, 3];
+    g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[13].num_add_pos_sym = [0, 1, 2, 3];
+
+    let dmrs_additional_position;
+
+    if (dci_format == 00) {
+
+        switch (pusch_mapping_type.trim()) {
+            case "A":
+                //if (freq_hop_flag == 'Disabled') {
+                if (freq_hop_flag == 0) {
+                    dmrs_additional_position = 2;
+                } else {
+                    dmrs_additional_position = 1;
+                }
+                return g_pusch_dmrs_add_pos_single_symb_freq_hop_disabled_typeA[symbol_length - 1].num_add_pos_sym[dmrs_additional_position];
+
+            case "B":
+                // Handle case B (code not provided)
+                break;
+        }
+        } else if (dci_format == 01) {
+            // Handle dci_format 01 (code not provided)
+        }
+
+        // Default case when no matching conditions are met
+        return null;
+    }
 
 
-function calculateUplinkThroughput() {
-  let uplinkLayer = parseInt(document.getElementById('uplinkLayer').value);
-  const uplinkMappingType = document.getElementById('uplinkMappingType').value;
-  const uplinkDciFormat = document.getElementById('uplinkDciFormat').value;
-  const uplinkDmrsLength = parseInt(document.getElementById('uplinkDmrsLength').value);
-  const uplinkMcsIndex = parseInt(document.getElementById('uplinkMcsIndex').value);
-  const uplinkNumRb = parseInt(document.getElementById('uplinkNumRb').value);
-  const uplinkModulationScheme = parseInt(document.getElementById('uplinkModulationScheme').value);
+    function calculateUplinkThroughput() {
+	    let symbol_length = 0;
+		let ul_slot_skip = 25;/*csireport /SR with periodcity 40 ms*/
+        let uplinkLayer = parseInt(document.getElementById('uplinkLayer').value);
+        const uplinkMappingType = document.getElementById('uplinkMappingType').value;
+        const uplinkDciFormat = document.getElementById('uplinkDciFormat').value;
+        const is_ota = document.getElementById('ota_or_vpal').value;
+        const uplinkMcsIndex = parseInt(document.getElementById('uplinkMcsIndex').value);
+        const uplinkNumRb = parseInt(document.getElementById('uplinkNumRb').value);
+	    const prachCfgIndex = parseInt(document.getElementById('prachCfgIndex').value);
+		const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
+        const uplinkModulationScheme = parseInt(document.getElementById('uplinkModulationScheme').value);
+        
+		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex);
+        if (uplinkDciFormat == 00) {
+            uplinkLayer = 1;
+        }
 
-  if (uplinkDciFormat == 00) {
-    uplinkLayer = 1;
-  }
-  const symbol_length = 12;
-  
-  const num_dmrs_add_pos_in_slot_p = get_dmrs_info(symbol_length, uplinkDciFormat, uplinkMappingType.trim(),0);
-  const ndmrs = (num_dmrs_add_pos_in_slot_p + 1) * 2 * 6;
-  
-  const N_overhead = 6;
-  const num_REs_per_prb = (symbol_length * 12) - ndmrs - N_overhead;
-  
-  let data_rate;
-  
-  if (uplinkModulationScheme === 1) {
-    data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 0);
-  } else {
-    data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 1);
-  }
-  
-  const uplinkThroughput = (data_rate * 16 * 100 *8)/1000000; // Assuming Mbps unit
-  
-  document.getElementById('uplinkResult').innerText = `Uplink Throughput: ${uplinkThroughput} Mbps`;
-}
+		if((is_ota.trim()) == "YES")
+		{
+		  symbol_length = 12;
+		}
+		else
+		{
+		  symbol_length = 13;
+		}
+        
+		if(prachCfgIndex == 180)
+		{
+		  ul_slot_skip += 50;
+        }
+        else
+        {
+           ul_slot_skip += 25;
+        }		
+        const num_dmrs_add_pos_in_slot_p = get_dmrs_info(symbol_length, uplinkDciFormat, uplinkMappingType.trim(),0);
+        const ndmrs = (num_dmrs_add_pos_in_slot_p + 1) * 2 * 6;
+
+        const N_overhead = 6;
+        const num_REs_per_prb = (symbol_length * 12) - ndmrs - N_overhead;
+
+        let data_rate;
+
+        if (uplinkModulationScheme === 1) {
+            data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 0);
+        } else {
+            data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 1);
+        }
+        		
+        const uplinkThroughput = (data_rate * (1600 - ul_slot_skip) *8)/1000000; // Assuming Mbps unit
+
+        document.getElementById('uplinkResult').innerText = `Total Uplink cell Throughput: ${uplinkThroughput} Mbps`;
+    }
+
 
 
     document.getElementById('downlinkForm').addEventListener('submit', function (event) {
