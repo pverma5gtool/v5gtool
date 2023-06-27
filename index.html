@@ -3,9 +3,10 @@
 <head>
   <title>Verana Theoretical Throughput Calculator</title>
   <style>
-    body {
+  
+ body {
       font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
+      background: linear-gradient(to bottom, #f6f8fc, #dfe7f2); /* Replace with desired gradient colors */
       padding: 20px;
       text-align: center; /* Center-align the content */
     }
@@ -15,19 +16,59 @@
       justify-content: center;
       align-items: flex-start;
       text-align: center;
+      margin-top: 20px;
     }
 
+       body::before,
+    body::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 50%; /* Set width for each background image */
+      z-index: -1;
+    }
+
+    body::before {
+      left: 0;
+      background-image: verana.jfif; /* Replace with the left background image URL */
+      background-size: cover;
+      background-position: center;
+    }
+
+    body::after {
+      right: 0;
+      background-image: url(right-background-image.jpg); /* Replace with the right background image URL */
+      background-size: cover;
+      background-position: center;
+    }
+
+    .container {
+      display: flex;
+      justify-content: flex-end; /* Align forms to the right */
+      align-items: flex-start;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+
+    .logo {
+      width: 400px;
+      margin-bottom: 20px; /* Add margin to create space below the logo */
+    }
     .form-section {
-      flex-basis: 50%;
+      flex-basis: 20%;
       background-color: #fff;
       padding: 20px;
       margin: 10px;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: relative; /* Add position:relative to allow z-index to work properly */
     }
 
     .form-group {
       margin-bottom: 20px;
+      text-align: left;
     }
 
     label {
@@ -66,20 +107,19 @@
       font-weight: bold;
     }
 
-    @media (max-width: 600px) {
-      .container {
-        flex-direction: column;
-      }
+    img.logo {
+      width: 200px;
+    }
 
-      .form-section {
-        width: 100%;
-      }
+    h1 {
+      color: #4CAF50;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-   
-  <img src="images/logo.PNG" alt="Logo">
+   <img src="verana.jfif" alt="Background Image" class="background-image">
+  <img src="logo.png" alt="Logo">
   <h1 style="text-align: center;">Verana Theoretical Throughput Calculator</h1>
   <div class="container">
     <div class="form-section">
@@ -87,8 +127,18 @@
       <form id="downlinkForm">
         <div class="form-group">
           <label for="layer">Number of Layers:</label>
-          <input type="number" id="layer" name="layer" min="1" max="2" required>
+          <input type="number" id="layer" name="layer" min="1" max="2" value="1" required>		  
         </div>
+		
+         <div class="form-group">
+          <label for="numcc">Number of CC:</label>
+          <input type="number" id="numcc" name="numcc" min="1" max="4" value="1" required>
+        </div>
+
+         <div class="form-group">
+          <label for="numpanel">Number of panel:</label>
+          <input type="number" id="numpanel" name="numpanel" min="1" max="4" value="1" required>
+        </div>		
 
         <div class="form-group">
           <label for="pushMappingType">PDSCH Mapping Type:</label>
@@ -116,19 +166,19 @@
 		
         <div class="form-group">
           <label for="mcsIndex">MCS Index:</label>
-          <input type="number" id="mcsIndex" name="mcsIndex" min="0" max="28" required>
+          <input type="number" id="mcsIndex" name="mcsIndex" min="0" max="28" value="28" required>
         </div>
 
         <div class="form-group">
           <label for="numRb">Number of RBs:</label>
-          <input type="number" id="numRb" name="numRb" min="1" max="66" required>
+          <input type="number" id="numRb" name="numRb" min="1" max="66" value="66" required>
         </div>
 
         <div class="form-group">
           <label for="modulationScheme">Modulation Scheme:</label>
           <select id="modulationScheme" name="modulationScheme" required>
-            <option value="1">1</option>
-            <option value="2">2</option>
+            <option value="64QAM">64QAM</option>
+            <option value="256QAM">256QAM</option>
           </select>
         </div>
 
@@ -194,8 +244,8 @@
         <div class="form-group">
           <label for="uplinkModulationScheme">Modulation Scheme:</label>
           <select id="uplinkModulationScheme" name="uplinkModulationScheme" required>
-            <option value="1">1</option>
-            <option value="2">2</option>
+            <option value="64QAM">64QAM</option>
+            <option value="256QAM">256QAM</option>
           </select>
         </div>
 
@@ -450,7 +500,7 @@ function calculateTransBlockQAM(num_res_per_prb, num_layer, mcs, prb, qam_val) {
     numLayer = num_layer;
     mcsIndex = mcs;
     prbIndex = prb;
-    if (qam_val === 0) { // MCS_TABLE_64_QAM
+    if (qam_val == 0) { // MCS_TABLE_64_QAM
         R = TBS_TableA[mcsIndex][2] / 1024.0;
         Ninfo = Nre * R * numLayer * TBS_TableA[mcsIndex][1] * prbIndex;
 
@@ -587,6 +637,61 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
         const uplinkNumRb = parseInt(document.getElementById('uplinkNumRb').value);
 	    const prachCfgIndex = parseInt(document.getElementById('prachCfgIndex').value);
 		const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
+        const uplinkModulationScheme = document.getElementById('uplinkModulationScheme').value;
+        
+		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim());
+        if (uplinkDciFormat == 00) {
+            uplinkLayer = 1;
+        }
+
+		if((is_ota.trim()) == "YES")
+		{
+		  symbol_length = 12;
+		}
+		else
+		{
+		  symbol_length = 13;
+		}
+        
+		if(prachCfgIndex == 180)
+		{
+		  ul_slot_skip += 50;
+        }
+        else
+        {
+           ul_slot_skip += 25;
+        }		
+        const num_dmrs_add_pos_in_slot_p = get_dmrs_info(symbol_length, uplinkDciFormat, uplinkMappingType.trim(),0);
+        const ndmrs = (num_dmrs_add_pos_in_slot_p + 1) * 2 * 6;
+
+        const N_overhead = 6;
+        const num_REs_per_prb = (symbol_length * 12) - ndmrs - N_overhead;
+
+        let data_rate;
+
+        if ((uplinkModulationScheme.trim()) == "64QAM") {
+            data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 0);
+        } else {
+            data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 1);
+        }
+        		
+        const uplinkThroughput = (data_rate * (1600 - ul_slot_skip) *8)/1000000; // Assuming Mbps unit
+
+        document.getElementById('uplinkResult').innerText = `Total Uplink cell Throughput: ${uplinkThroughput} Mbps`;
+    }
+
+
+       function calculateDownlinkThroughput() {
+	    let symbol_length = 0;
+		let ul_slot_skip = 25;/*csireport /SR with periodcity 40 ms*/
+        let uplinkLayer = parseInt(document.getElementById('uplinkLayer').value);
+        const uplinkMappingType = document.getElementById('uplinkMappingType').value;
+        const uplinkDciFormat = document.getElementById('uplinkDciFormat').value;
+        const is_ota = document.getElementById('ota_or_vpal').value;
+        const uplinkMcsIndex = parseInt(document.getElementById('uplinkMcsIndex').value);
+        const uplinkNumRb = parseInt(document.getElementById('uplinkNumRb').value);
+	    const prachCfgIndex = parseInt(document.getElementById('prachCfgIndex').value);
+		const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
         const uplinkModulationScheme = parseInt(document.getElementById('uplinkModulationScheme').value);
         
 		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex);
@@ -629,9 +734,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 
         document.getElementById('uplinkResult').innerText = `Total Uplink cell Throughput: ${uplinkThroughput} Mbps`;
     }
-
-
-
+	
     document.getElementById('downlinkForm').addEventListener('submit', function (event) {
       event.preventDefault();
       calculateDownlinkThroughput();
