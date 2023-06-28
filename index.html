@@ -140,19 +140,29 @@
           <input type="number" id="numpanel" name="numpanel" min="1" max="4" value="1" required>
         </div>		
 
+         <div class="form-group">
+          <label for="numwb">Number of wide beam:</label>
+          <input type="number" id="numwb" name="numwb" min="1" max="10" value="1" required>
+        </div>	
+		
+		<div class="form-group">
+          <label for="numnb">Number of narrow beam:</label>
+          <input type="number" id="numnb" name="numnb" min="1" max="62" value="31" required>
+        </div>	
+		
         <div class="form-group">
-          <label for="pushMappingType">PDSCH Mapping Type:</label>
-          <select id="pushMappingType" name="pushMappingType" required>
+          <label for="pdschMappingType">PDSCH Mapping Type:</label>
+          <select id="pdschMappingType" name="pdschMappingType" required>
             <option value="A">A</option>
             <option value="B">B</option>
           </select>
         </div>
-
-        <div class="form-group">
+		
+		<div class="form-group">
           <label for="dciFormat">DCI Format:</label>
-          <select id="dciFormat" name="dciFormat" required>
+           <select id="dciFormat" name="dciFormat" required>
             <option value="10">10</option>
-            <option value="11">11</option>
+            <option value="11" selected>11</option>
           </select>
         </div>
 
@@ -174,6 +184,11 @@
           <input type="number" id="numRb" name="numRb" min="1" max="66" value="66" required>
         </div>
 
+       <div class="form-group">
+          <label for="numdlUe">Num DL User:</label>
+          <input type="number" id="numdlUe" name="numdlUe" min="1" max="32"  value="1" required>
+       </div>
+	   
         <div class="form-group">
           <label for="modulationScheme">Modulation Scheme:</label>
           <select id="modulationScheme" name="modulationScheme" required>
@@ -237,7 +252,7 @@
         </div>
 
         <div class="form-group">
-          <label for="ulnumuser">Number of UE:</label>
+          <label for="ulnumuser">Num UL User:</label>
           <input type="number" id="ulnumuser" name="ulnumuser" min="1" max="32"  value="1" required>
        </div>
 		
