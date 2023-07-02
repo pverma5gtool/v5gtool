@@ -751,13 +751,12 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
         return null;
 }
 	
-  
-     function calculateDownlinkThroughput() 
+ function calculateDownlinkThroughput() 
 	 {
 	    let symbol_length = 0;
 		let start_symbol = 0;
 		let pdsch_length = 0;
-		let dl_slot_skip = 25;
+		let dl_slot_skip = 0;
 		let num_dmrs_add_pos_in_slot = 0;
         let numLayer = parseInt(document.getElementById('layer').value);
 		const numcc  = parseInt(document.getElementById('numcc').value);
@@ -772,48 +771,48 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
 		const numdlUe = parseInt(document.getElementById('numdlUe').value);
 		const modulationScheme = document.getElementById('modulationScheme').value;
 		
+		let downlinkThroughput = 0;
 		const DMRS_TYPE_1_DMRS_SYMBOLS_PER_PRB = 6;
 		const NUM_CDM_GROUP = 2;
+		var  slivUsedLenght = [13,12,13];
+		var  slivUsedstart = [1,2,1];
+		var allDslottpt = new Array(); 
              		
         if (dciFormat == 10) {
 		
             numLayer = 1;
         }
+
+
 		
-		symbol_length = pdsch_length + start_symbol;
+		for(var i = 0; i < 3 ; i++)
+		{
 		
+		start_symbol = slivUsedstart[i];
 		if((dlota_or_vpal.trim()) == "YES")
 		{
-		  symbol_length = 12;
+		  pdsch_length = (slivUsedLenght[i] - 1);
+		 
 		}
 		else
 		{
-		  symbol_length = 13;
+		   pdsch_length = slivUsedLenght[i]; 
 		}
-        /*
-		if(prachCfgIndex == 180)
-		{
-		  dl_slot_skip += 50;
-        }
-        else
-        {
-           dl_slot_skip += 25;
-        }	*/	
+		symbol_length = pdsch_length + start_symbol;
+		       		
 		if(dciFormat == 10)
 		{
             num_dmrs_add_pos_in_slot = get_dl_dmrs_info(symbol_length, dciFormat, pdschMappingType.trim(), 2 , 1);			
 		}
 		else
 		{
-		   num_dmrs_add_pos_in_slot = get_dl_dmrs_info(symbol_length, dciFormat, pdschMappingType.trim(), 0 , 1);
-		   
+		   num_dmrs_add_pos_in_slot = get_dl_dmrs_info(symbol_length, dciFormat, pdschMappingType.trim(), 0 , 1);	   
 		}
         const ndmrs = (num_dmrs_add_pos_in_slot + 1) * NUM_CDM_GROUP * DMRS_TYPE_1_DMRS_SYMBOLS_PER_PRB;
         
         const N_overhead = 6;
-        const num_REs_per_prb = (symbol_length * 12) - ndmrs - N_overhead;
-		
-        
+        const num_REs_per_prb = (pdsch_length * 12) - ndmrs - N_overhead;
+		       
         let data_rate;
 
          if ((modulationScheme.trim()) == "64QAM") {
@@ -822,8 +821,31 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
             data_rate = calculateTransBlockQAM(num_REs_per_prb, numLayer, mcsIndex, numRb, 1);
         }
         	
-        const downlinkThroughput = (data_rate * (4800 - dl_slot_skip) *8)/1000000; // Assuming Mbps unit
-		console.log("pverma",numLayer,numcc,numpanel,numwb,numnb,pdschMappingType,dciFormat,dlota_or_vpal.trim(),mcsIndex,numRb,numdlUe,modulationScheme,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);	
+         downlinkThroughput = (data_rate * /*(4800 - dl_slot_skip)*/ 8)/1000000; // Assuming Mbps unit
+		 allDslottpt[i] = downlinkThroughput;
+		console.log("pverma",pdsch_length,start_symbol,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);
+		}
+		
+		downlinkThroughput = allDslottpt[0]*1600+ allDslottpt[1]*1600 + allDslottpt[2]*1600;
+		//if(numpanel == 1)
+		{
+		  dl_slot_skip += ((Math.ceil((numnb/4)))*(1000/80)); // 1 port csi-rs SLOT		
+		  dl_slot_skip += numwb*(1000/20); //ssb slot	 
+		  dl_slot_skip += numwb*(1000/80); //sib1 slot	  
+        }
+        if(numpanel == 2)
+        {
+           dl_slot_skip *= 2;
+        }
+		
+		downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[0];
+		dl_slot_skip = 0;
+		dl_slot_skip = (Math.ceil(numdlUe/4))*(1000/40); /*2 port csi-rs */
+		downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[1];
+		
+		downlinkThroughput = numcc*downlinkThroughput;
+
+		//console.log("pverma",numLayer,numcc,numpanel,numwb,numnb,pdschMappingType,dciFormat,dlota_or_vpal.trim(),mcsIndex,numRb,numdlUe,modulationScheme,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);	
 
         document.getElementById('downlinkResult').innerText = `Total Downlink cell Throughput: ${downlinkThroughput}`;
 		
