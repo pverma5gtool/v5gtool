@@ -652,7 +652,6 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 	    const DMRS_TYPE_1_DMRS_SYMBOLS_PER_PRB = 6;
 		const NUM_CDM_GROUP = 2;
 	    let symbol_length = 0;
-	    let start_sym = 0;
 		let ul_slot_skip = 25;/*csireport /SR with periodcity 40 ms*/
         let uplinkLayer = parseInt(document.getElementById('uplinkLayer').value);
         const uplinkMappingType = document.getElementById('uplinkMappingType').value;
@@ -664,7 +663,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 		const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
         const uplinkModulationScheme = document.getElementById('uplinkModulationScheme').value;
         
-		//console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim());
+		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim());
         if (uplinkDciFormat == 00) {
             uplinkLayer = 1;
         }
@@ -699,10 +698,38 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
         } else {
             data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 1);
         }
-        console.log("[pusch_start_symbol,pusch_sym_lentgh,tbsize]",start_sym,symbol_length,data_rate);		
+        		
         const uplinkThroughput = (data_rate * (1600 - ul_slot_skip) *8)/1000000; // Assuming Mbps unit
 
-        document.getElementById('uplinkResult').innerText = `Total Uplink cell Throughput: ${uplinkThroughput} Mbps`;
+        //document.getElementById('uplinkResult').innerText = `Total Uplink cell Throughput: ${uplinkThroughput} Mbps`;
+		
+	  var table = document.createElement("table");
+      var row1 = table.insertRow();
+      var cell1 = row1.insertCell();
+      var cell2 = row1.insertCell();
+      var row2 = table.insertRow();
+      var cell3 = row2.insertCell();
+      var cell4 = row2.insertCell();
+	  
+      cell1.innerHTML = "Total Uplink cell Throughput";
+      cell2.innerHTML = uplinkThroughput;
+	  if((is_ota.trim()) == "YES")
+	  {
+       cell3.innerHTML = "SLIV (0,12)Tbs";
+	   cell4.innerHTML = data_rate;
+	  }
+	  else
+	  {
+	   cell3.innerHTML = "SLIV (0,13)Tbs";
+	   cell4.innerHTML = data_rate;
+	  }
+   
+       row1.style.backgroundColor = "#f2f2f2"; // Set background color
+       row2.style.backgroundColor = "#e6e6e6"; // Set background color
+       cell1.style.paddingLeft = "10px"; // Set indentation
+       cell3.style.paddingLeft = "10px"; // Set indentation	  
+	  var tableContainer = document.getElementById("uplinkResult");
+      tableContainer.appendChild(table);
     }
 
 
@@ -757,7 +784,7 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
         return null;
 }
 	
- function calculateDownlinkThroughput() 
+     function calculateDownlinkThroughput() 
 	 {
 	    let symbol_length = 0;
 		let start_symbol = 0;
@@ -783,6 +810,8 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
 		var  slivUsedLenght = [13,12,13];
 		var  slivUsedstart = [1,2,1];
 		var allDslottpt = new Array(); 
+		var allSlivTbs = new Array(); 
+		
              		
         if (dciFormat == 10) {
 		
@@ -826,10 +855,10 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
         } else {
             data_rate = calculateTransBlockQAM(num_REs_per_prb, numLayer, mcsIndex, numRb, 1);
         }
-        	
+         allSlivTbs[i] = data_rate;
          downlinkThroughput = (data_rate * /*(4800 - dl_slot_skip)*/ 8)/1000000; // Assuming Mbps unit
 		 allDslottpt[i] = downlinkThroughput;
-		console.log("[pdsch_start_symbol,pdsch_sym_lentgh,tbsize]",start_symbol,pdsch_length,data_rate,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);
+		 console.log("pverma",pdsch_length,start_symbol,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);
 		}
 		
 		downlinkThroughput = allDslottpt[0]*1600+ allDslottpt[1]*1600 + allDslottpt[2]*1600;
@@ -852,8 +881,57 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
 		downlinkThroughput = numcc*downlinkThroughput;
 
 		//console.log("pverma",numLayer,numcc,numpanel,numwb,numnb,pdschMappingType,dciFormat,dlota_or_vpal.trim(),mcsIndex,numRb,numdlUe,modulationScheme,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);	
+       
+	   // Create a table and populate it with the data
+      var table = document.createElement("table");
+      var row1 = table.insertRow();
+      var cell1 = row1.insertCell();
+      var cell2 = row1.insertCell();
+      var row2 = table.insertRow();
+      var cell3 = row2.insertCell();
+      var cell4 = row2.insertCell();
+	  var row3 = table.insertRow();
+      var cell5 = row3.insertCell();
+      var cell6 = row3.insertCell();
+	  var row4 = table.insertRow();
+      var cell7 = row4.insertCell();
+      var cell8 = row4.insertCell();
 
-        document.getElementById('downlinkResult').innerText = `Total Downlink cell Throughput: ${downlinkThroughput}`;
+      cell1.innerHTML = "Total Downlink cell Throughput";
+      cell2.innerHTML = downlinkThroughput;
+	  if((dlota_or_vpal.trim()) == "YES")
+	  {
+      cell3.innerHTML = "1st D slot tbs(sliv 1,12)";
+	  cell4.innerHTML = allSlivTbs[0];
+	  cell5.innerHTML = "2nd D slot tbs(sliv 2,11)";
+	  cell6.innerHTML = allSlivTbs[1];
+	  cell7.innerHTML = "3rd D slot tbs(sliv 1,12)";
+	  cell8.innerHTML = allSlivTbs[2];
+	  }
+	  else
+	  {
+	  cell3.innerHTML = "1st D slot tbs(sliv 1,13)";
+	  cell4.innerHTML = allSlivTbs[0];
+	  cell5.innerHTML = "2nd D slot tbs(sliv 2,12)";
+	  cell6.innerHTML = allSlivTbs[1];
+	  cell7.innerHTML = "3rd D slot tbs(sliv 1,13)";
+	  cell8.innerHTML = allSlivTbs[2];
+	  }
+   
+       row1.style.backgroundColor = "#f2f2f2"; // Set background color
+       row2.style.backgroundColor = "#e6e6e6"; // Set background color
+	   row3.style.backgroundColor = "#f2f2f2"; // Set background color
+       row4.style.backgroundColor = "#e6e6e6"; // Set background color
+       cell1.style.paddingLeft = "10px"; // Set indentation
+       cell3.style.paddingLeft = "10px"; // Set indentation
+	   cell5.style.paddingLeft = "10px"; // Set indentation
+       cell7.style.paddingLeft = "10px"; // Set indentation
+	   
+	  
+      //document.getElementById('downlinkResult').innerText = `Total Downlink cell Throughput: ${downlinkThroughput}`;
+	  
+	  var tableContainer = document.getElementById("downlinkResult");
+      tableContainer.appendChild(table);
 		
     }
 	
