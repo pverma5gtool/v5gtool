@@ -652,6 +652,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 	    const DMRS_TYPE_1_DMRS_SYMBOLS_PER_PRB = 6;
 		const NUM_CDM_GROUP = 2;
 	    let symbol_length = 0;
+	    let start_sym = 0;
 		let ul_slot_skip = 25;/*csireport /SR with periodcity 40 ms*/
         let uplinkLayer = parseInt(document.getElementById('uplinkLayer').value);
         const uplinkMappingType = document.getElementById('uplinkMappingType').value;
@@ -663,7 +664,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 		const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
         const uplinkModulationScheme = document.getElementById('uplinkModulationScheme').value;
         
-		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim());
+		//console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim());
         if (uplinkDciFormat == 00) {
             uplinkLayer = 1;
         }
@@ -698,7 +699,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
         } else {
             data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 1);
         }
-        		
+        console.log("[pusch_start_symbol,pusch_sym_lentgh,tbsize]",start_sym,symbol_length,data_rate,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);		
         const uplinkThroughput = (data_rate * (1600 - ul_slot_skip) *8)/1000000; // Assuming Mbps unit
 
         document.getElementById('uplinkResult').innerText = `Total Uplink cell Throughput: ${uplinkThroughput} Mbps`;
