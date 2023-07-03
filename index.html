@@ -28,18 +28,19 @@ body {
       z-index: -1;
     }
 
-    body::before {
-      position: absolute;
-      top: 65%;
-      left: 0%;
+      body::before {
+      content: "";
+      position: fixed; /* Use fixed positioning */
+      top: 40%; /* Position the image at 50% from the top */
+      left: 0%; /* Position the image at the left side of the viewport */
       width: 50%;
-      height:100%;
+      height: 60vh; /* Use 100vh to cover the entire viewport height */
       z-index: -1;
       background-image: url(images/tbs3.PNG); /* Replace with the left background image URL */
-      background-size: cover;
+      background-size: contain;
+      background-repeat: no-repeat;
       background-position: center;
     }
-
     body::after {
       right: 0;
       background-image: url(right-background-image.jpg); /* Replace with the right background image URL */
