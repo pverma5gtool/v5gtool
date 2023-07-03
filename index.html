@@ -828,7 +828,7 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
         	
          downlinkThroughput = (data_rate * /*(4800 - dl_slot_skip)*/ 8)/1000000; // Assuming Mbps unit
 		 allDslottpt[i] = downlinkThroughput;
-		console.log("[pdsch_start_symbol,pdsch_sym_lentgh,tbsize]",pdsch_length,start_symbol,data_rate,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);
+		console.log("[pdsch_start_symbol,pdsch_sym_lentgh,tbsize]",start_symbol,pdsch_length,data_rate,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);
 		}
 		
 		downlinkThroughput = allDslottpt[0]*1600+ allDslottpt[1]*1600 + allDslottpt[2]*1600;
