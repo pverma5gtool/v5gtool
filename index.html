@@ -699,7 +699,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
         } else {
             data_rate = calculateTransBlockQAM(num_REs_per_prb, uplinkLayer, uplinkMcsIndex, uplinkNumRb, 1);
         }
-        console.log("[pusch_start_symbol,pusch_sym_lentgh,tbsize]",start_sym,symbol_length,data_rate,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);		
+        console.log("[pusch_start_symbol,pusch_sym_lentgh,tbsize]",start_sym,symbol_length,data_rate);		
         const uplinkThroughput = (data_rate * (1600 - ul_slot_skip) *8)/1000000; // Assuming Mbps unit
 
         document.getElementById('uplinkResult').innerText = `Total Uplink cell Throughput: ${uplinkThroughput} Mbps`;
