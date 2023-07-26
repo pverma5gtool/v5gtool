@@ -866,7 +866,8 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
 		{
 		  dl_slot_skip += ((Math.ceil((numnb/4)))*(1000/80)); // 1 port csi-rs SLOT		
 		  dl_slot_skip += numwb*(1000/20); //ssb slot	 
-		  dl_slot_skip += numwb*(1000/80); //sib1 slot	  
+		  //dl_slot_skip += numwb*(1000/80); //sib1 slot	  
+		  dl_slot_skip += numwb*(1000/20); //sib1 slot	
         }
         if(numpanel == 2)
         {
