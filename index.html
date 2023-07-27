@@ -652,7 +652,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 	    const DMRS_TYPE_1_DMRS_SYMBOLS_PER_PRB = 6;
 		const NUM_CDM_GROUP = 2;
 	    let symbol_length = 0;
-		let ul_slot_skip = 50;/*csireport /SR with periodcity 40 ms*/
+		let ul_slot_skip = 25;/*csireport /SR with periodcity 40 ms*/
         let uplinkLayer = parseInt(document.getElementById('uplinkLayer').value);
         const uplinkMappingType = document.getElementById('uplinkMappingType').value;
         const uplinkDciFormat = document.getElementById('uplinkDciFormat').value;
