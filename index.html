@@ -659,6 +659,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 	    let symbol_length = 0;
 		let ul_slot_skip = 25;/*csireport /SR with periodcity 40 ms*/
         let uplinkLayer = parseInt(document.getElementById('uplinkLayer').value);
+	const numpanel = parseInt(document.getElementById('ulnumpanel').value);
         const uplinkMappingType = document.getElementById('uplinkMappingType').value;
         const uplinkDciFormat = document.getElementById('uplinkDciFormat').value;
         const is_ota = document.getElementById('ota_or_vpal').value;
@@ -668,7 +669,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 		const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
         const uplinkModulationScheme = document.getElementById('uplinkModulationScheme').value;
         
-		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim());
+		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim(),numpanel);
         if (uplinkDciFormat == 00) {
             uplinkLayer = 1;
         }
