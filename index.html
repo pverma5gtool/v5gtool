@@ -686,7 +686,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
            ul_slot_skip += 25;
         }
 
-	ul_slot_skip += (1000/20);
+	//ul_slot_skip += (1000/20);
         const num_dmrs_add_pos_in_slot_p = get_dmrs_info(symbol_length, uplinkDciFormat, uplinkMappingType.trim(),0);
         const ndmrs = (num_dmrs_add_pos_in_slot_p + 1) * NUM_CDM_GROUP * DMRS_TYPE_1_DMRS_SYMBOLS_PER_PRB;;
 
