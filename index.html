@@ -534,7 +534,7 @@ function calculateTransBlockQAM(num_res_per_prb, num_layer, mcs, prb, qam_val) {
         R = TBS_TableB[mcsIndex][2] / 1024.0;
         Ninfo = Nre * R * numLayer * TBS_TableB[mcsIndex][1] * prbIndex;
     }
-
+   console.log("Ninfo",Ninfo);
     if (Ninfo <= 3824)
     {
         if (Math.log2(Ninfo) < 6) {
