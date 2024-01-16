@@ -884,10 +884,14 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
 		downlinkThroughput = allDslottpt[0]*1600+ allDslottpt[1]*1600 + allDslottpt[2]*1600;
 		//if(numpanel == 1)
 		{
-		  dl_slot_skip += ((Math.ceil((numnb/4)))*(1000/80)); // 1 port csi-rs SLOT		
+		  dl_slot_skip += ((Math.ceil((numnb/4)))*(1000/80)); // 1 port csi-rs SLOT	
+			console.log("1port",dl_slot_skip,downlinkThroughput);
 		  dl_slot_skip += numwb*(1000/20); //ssb slot	 
-		  //dl_slot_skip += numwb*(1000/80); //sib1 slot	  
+			console.log("ssb",dl_slot_skip);
+		  //dl_slot_skip += numwb*(1000/80); //sib1 slot
+			
 		  dl_slot_skip += numwb*(1000/20); //sib1 slot	
+			console.log("sib1",dl_slot_skip);
         }
         if(numpanel == 2)
         {
@@ -897,6 +901,7 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
 		downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[0];
 		dl_slot_skip = 0;
 		dl_slot_skip = (Math.ceil(numdlUe/4))*(1000/40); /*2 port csi-rs */
+		 console.log("2 port",dl_slot_skip,downlinkThroughput);
 		downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[1];
 		
 		downlinkThroughput = numcc*downlinkThroughput;
