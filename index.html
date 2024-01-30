@@ -670,7 +670,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 		const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
         const uplinkModulationScheme = document.getElementById('uplinkModulationScheme').value;
         
-		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim(),numpanel,pusch_sym);
+		console.log("pverma",uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim(),numpanel,pusch_sym);
         if (uplinkDciFormat == 00) {
             uplinkLayer = 1;
         }
