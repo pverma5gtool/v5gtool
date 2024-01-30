@@ -934,7 +934,7 @@ function calculateDownlinkThroughput()
    
     if((numdlUecpe) && (!numdlUe))
     {
-       dl_slot_skip_ssb_muted_slot +=  (1000/80);
+       dl_slot_skip_ssb_muted_slot +=  (1000/20);
        downlinkThroughput = downlinkThroughput - dl_slot_skip_ssb_muted_slot*allDslottpt[2];
     }
     downlinkThroughput = numcc*downlinkThroughput;
