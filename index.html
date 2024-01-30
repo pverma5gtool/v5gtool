@@ -243,6 +243,13 @@ body {
             <option value="13">13</option>
           </select>
         </div>
+	<div class="form-group">
+          <label for="single_panle_ota">single panel ota</label>
+		  <select id="single_panle_ota" name="single_panle_ota" required>
+            <option value="YES">YES</option>
+            <option value="YES">YES</option>
+          </select>
+        </div>
 
         <div class="form-group">
           <label for="prachCfgIndex">PRACHCFGINDEX</label>
@@ -664,6 +671,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
         const uplinkMappingType = document.getElementById('uplinkMappingType').value;
         const uplinkDciFormat = document.getElementById('uplinkDciFormat').value;
         const pusch_sym = document.getElementById('pusch_sym').value;
+	const  single_panle_ota = document.getElementById('single_panle_ota').value;
         const uplinkMcsIndex = parseInt(document.getElementById('uplinkMcsIndex').value);
         const uplinkNumRb = parseInt(document.getElementById('uplinkNumRb').value);
 	    const prachCfgIndex = parseInt(document.getElementById('prachCfgIndex').value);
@@ -684,18 +692,19 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 		{
 		  symbol_length = 13;
 		}*/
-	    symbol_length = pusch_sym;
+	    
+	symbol_length = pusch_sym;
         
-		if(prachCfgIndex == 180)
-		{
-		  ul_slot_skip += 50;
+	if(prachCfgIndex == 180)
+	{
+	    ul_slot_skip += 50;
         }
         else
         {
-           ul_slot_skip += 25;
+            ul_slot_skip += 25;
         }
 
-	if((is_ota.trim()) == "YES")
+	if((single_panle_ota.trim()) == "YES")
 	{
 	   ul_slot_skip += (1000/20);
 	}
