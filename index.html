@@ -239,12 +239,12 @@ body {
         <div class="form-group">
           <label for="pusch_sym">PUSCH SYMBOL</label>
 		  <select id="pusch_sym" name="pusch_sym" required>
-            <option value="12">12</option>
             <option value="13">13</option>
+            <option value="12">12</option>
           </select>
         </div>
 	<div class="form-group">
-          <label for="single_panle_ota">single panel ota</label>
+          <label for="single_panle_ota">IS OTA</label>
 		  <select id="single_panle_ota" name="single_panle_ota" required>
             <option value="YES">YES</option>
             <option value="YES">YES</option>
@@ -744,7 +744,7 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 	  
       cell1.innerHTML = "Total Uplink cell Throughput";
       cell2.innerHTML = uplinkThroughput;
-	  if((is_ota.trim()) == "YES")
+	  if(pusch_sym == 12)
 	  {
        cell3.innerHTML = "SLIV (0,12)Tbs";
 	   cell4.innerHTML = data_rate;
