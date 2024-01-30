@@ -237,10 +237,10 @@ body {
         </div>
 
         <div class="form-group">
-          <label for="ota_or_vpal">IS OTA</label>
-		  <select id="ota_or_vpal" name="ota_or_vpal" required>
-            <option value="YES">YES</option>
-            <option value="NO">NO</option>
+          <label for="pusch_sym">PUSCH SYMBOL</label>
+		  <select id="pusch_sym" name="pusch_sym" required>
+            <option value="12">12</option>
+            <option value="13">13</option>
           </select>
         </div>
 
@@ -663,26 +663,28 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 	const numpanel = parseInt(document.getElementById('ulnumpanel').value);
         const uplinkMappingType = document.getElementById('uplinkMappingType').value;
         const uplinkDciFormat = document.getElementById('uplinkDciFormat').value;
-        const is_ota = document.getElementById('ota_or_vpal').value;
+        const pusch_sym = document.getElementById('pusch_sym').value;
         const uplinkMcsIndex = parseInt(document.getElementById('uplinkMcsIndex').value);
         const uplinkNumRb = parseInt(document.getElementById('uplinkNumRb').value);
 	    const prachCfgIndex = parseInt(document.getElementById('prachCfgIndex').value);
 		const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
         const uplinkModulationScheme = document.getElementById('uplinkModulationScheme').value;
         
-		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim(),numpanel);
+		console.log("pverma",is_ota.trim(),uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim(),numpanel,pusch_sym);
         if (uplinkDciFormat == 00) {
             uplinkLayer = 1;
         }
 
-		if((is_ota.trim()) == "YES")
+		/*
+	       if((is_ota.trim()) == "YES")
 		{
 		  symbol_length = 12;
 		}
 		else
 		{
 		  symbol_length = 13;
-		}
+		}*/
+	    symbol_length = pusch_sym;
         
 		if(prachCfgIndex == 180)
 		{
