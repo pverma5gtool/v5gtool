@@ -191,8 +191,12 @@ body {
         </div>
 
        <div class="form-group">
-          <label for="numdlUe">Num DL User:</label>
+          <label for="numdlUe">Num MT User:</label>
           <input type="number" id="numdlUe" name="numdlUe" min="1" max="32"  value="1" required>
+       </div>
+	<div class="form-group">
+          <label for="numdlUecpe">Num CPE User:</label>
+          <input type="number" id="numdlUecpe" name="numdlUecpe" min="1" max="32"  value="1" required>
        </div>
 	   
         <div class="form-group">
@@ -674,8 +678,9 @@ function get_dmrs_info(symbol_length, dci_format,pusch_mapping_type, freq_hop_fl
 	const  single_panle_ota = document.getElementById('single_panle_ota').value;
         const uplinkMcsIndex = parseInt(document.getElementById('uplinkMcsIndex').value);
         const uplinkNumRb = parseInt(document.getElementById('uplinkNumRb').value);
-	    const prachCfgIndex = parseInt(document.getElementById('prachCfgIndex').value);
-		const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
+	const prachCfgIndex = parseInt(document.getElementById('prachCfgIndex').value);
+	const ulNumUe = parseInt(document.getElementById('ulnumuser').value);
+	
         const uplinkModulationScheme = document.getElementById('uplinkModulationScheme').value;
         
 		console.log("pverma",uplinkLayer,ulNumUe,prachCfgIndex,uplinkModulationScheme.trim(),numpanel,pusch_sym);
@@ -832,7 +837,8 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
         const dlota_or_vpal = document.getElementById('dlota_or_vpal').value;
         const mcsIndex = parseInt(document.getElementById('mcsIndex').value);
         const numRb = parseInt(document.getElementById('numRb').value);  
-		const numdlUe = parseInt(document.getElementById('numdlUe').value);
+	const numdlUe = parseInt(document.getElementById('numdlUe').value);
+	const numdlUecpe parseInt(document.getElementById('ulnumuser').value);
 		const modulationScheme = document.getElementById('modulationScheme').value;
 		
 		let downlinkThroughput = 0;
@@ -896,9 +902,13 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
 		//if(numpanel == 1)
 		{
 		  dl_slot_skip += ((Math.ceil((numnb/4)))*(1000/80)); // 1 port csi-rs SLOT	
-			console.log("1port",dl_slot_skip,downlinkThroughput);
-		  dl_slot_skip += numwb*(1000/20); //ssb slot	 
-			console.log("ssb",dl_slot_skip);
+		  console.log("1port",dl_slot_skip,downlinkThroughput);
+		  dl_slot_skip += numwb*(1000/20); //ssb slot
+		 if(numdlUecpe)
+		 {
+			dl_slot_skip += (1000/20);
+		 }
+		  console.log("ssb",dl_slot_skip);
 		  //dl_slot_skip += numwb*(1000/80); //sib1 slot
 			
 		  dl_slot_skip += numwb*(1000/20); //sib1 slot	
@@ -911,7 +921,7 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
 		
 		downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[0];
 		dl_slot_skip = 0;
-		dl_slot_skip = (Math.ceil(numdlUe/4))*(1000/40); /*2 port csi-rs */
+		dl_slot_skip = (Math.ceil((numdlUe + numdlUecpe)/4))*(1000/40); /*2 port csi-rs */
 		 console.log("2 port",dl_slot_skip,downlinkThroughput);
 		downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[1];
 		
