@@ -196,7 +196,7 @@ body {
        </div>
 	<div class="form-group">
           <label for="numdlUecpe">Num CPE User:</label>
-          <input type="number" id="numdlUecpe" name="numdlUecpe" min="0" max="32"  value="1" required>
+          <input type="number" id="numdlUecpe" name="numdlUecpe" min="0" max="32"  value="0" required>
        </div>
 	   
         <div class="form-group">
@@ -820,169 +820,183 @@ function get_dl_dmrs_info(symbol_length, dci_format,pdsch_mapping_type, dmrs_add
         return null;
 }
 	
-     function calculateDownlinkThroughput() 
-	 {
-	    let symbol_length = 0;
-		let start_symbol = 0;
-		let pdsch_length = 0;
-		let dl_slot_skip = 0;
-		let num_dmrs_add_pos_in_slot = 0;
-        let numLayer = parseInt(document.getElementById('layer').value);
-		const numcc  = parseInt(document.getElementById('numcc').value);
-		const numpanel = parseInt(document.getElementById('numpanel').value);
-		const numwb = parseInt(document.getElementById('numwb').value);
-		const numnb = parseInt(document.getElementById('numnb').value);
-        const pdschMappingType = document.getElementById('pdschMappingType').value;
-        const dciFormat = document.getElementById('dciFormat').value;
-        const dlota_or_vpal = document.getElementById('dlota_or_vpal').value;
-        const mcsIndex = parseInt(document.getElementById('mcsIndex').value);
-        const numRb = parseInt(document.getElementById('numRb').value);  
-	const numdlUe = parseInt(document.getElementById('numdlUe').value);
-	const numdlUecpe =  parseInt(document.getElementById('numdlUecpe').value);
-		const modulationScheme = document.getElementById('modulationScheme').value;
-		
-		let downlinkThroughput = 0;
-		const DMRS_TYPE_1_DMRS_SYMBOLS_PER_PRB = 6;
-		const NUM_CDM_GROUP = 2;
-		var  slivUsedLenght = [13,12,13];
-		var  slivUsedstart = [1,2,1];
-		var allDslottpt = new Array(); 
-		var allSlivTbs = new Array(); 
-		
-             		
-        if (dciFormat == 10) {
-		
-            numLayer = 1;
+function calculateDownlinkThroughput()
+{
+    let symbol_length = 0;
+    let start_symbol = 0;
+    let pdsch_length = 0;
+    let dl_slot_skip = 0;
+    let dl_slot_skip_ssb_muted_slot = 0;
+    let total_dl_slot_for_pdsch = 4800;
+    let num_dmrs_add_pos_in_slot = 0;
+    let numLayer = parseInt(document.getElementById('layer').value);
+    const numcc  = parseInt(document.getElementById('numcc').value);
+    const numpanel = parseInt(document.getElementById('numpanel').value);
+    const numwb = parseInt(document.getElementById('numwb').value);
+    const numnb = parseInt(document.getElementById('numnb').value);
+    const pdschMappingType = document.getElementById('pdschMappingType').value;
+    const dciFormat = document.getElementById('dciFormat').value;
+    const dlota_or_vpal = document.getElementById('dlota_or_vpal').value;
+    const mcsIndex = parseInt(document.getElementById('mcsIndex').value);
+    const numRb = parseInt(document.getElementById('numRb').value);
+    const numdlUe = parseInt(document.getElementById('numdlUe').value);
+    const numdlUecpe =  parseInt(document.getElementById('numdlUecpe').value);
+    const modulationScheme = document.getElementById('modulationScheme').value;
+
+    let downlinkThroughput = 0;
+    const DMRS_TYPE_1_DMRS_SYMBOLS_PER_PRB = 6;
+    const NUM_CDM_GROUP = 2;
+    var  slivUsedLenght = [13,12,13];
+    var  slivUsedstart = [1,2,1];
+    var allDslottpt = new Array();
+    var allSlivTbs = new Array();
+
+
+    if (dciFormat == 10) {
+
+        numLayer = 1;
+    }
+
+
+
+    for(var i = 0; i < 3 ; i++)
+    {
+
+        start_symbol = slivUsedstart[i];
+        if((dlota_or_vpal.trim()) == "YES")
+        {
+            pdsch_length = (slivUsedLenght[i] - 1);
+
         }
+        else
+        {
+            pdsch_length = slivUsedLenght[i];
+        }
+        symbol_length = pdsch_length + start_symbol;
 
-
-		
-		for(var i = 0; i < 3 ; i++)
-		{
-		
-		start_symbol = slivUsedstart[i];
-		if((dlota_or_vpal.trim()) == "YES")
-		{
-		  pdsch_length = (slivUsedLenght[i] - 1);
-		 
-		}
-		else
-		{
-		   pdsch_length = slivUsedLenght[i]; 
-		}
-		symbol_length = pdsch_length + start_symbol;
-		       		
-		if(dciFormat == 10)
-		{
-            num_dmrs_add_pos_in_slot = get_dl_dmrs_info(symbol_length, dciFormat, pdschMappingType.trim(), 2 , 1);			
-		}
-		else
-		{
-		   num_dmrs_add_pos_in_slot = get_dl_dmrs_info(symbol_length, dciFormat, pdschMappingType.trim(), 0 , 1);	   
-		}
+        if(dciFormat == 10)
+        {
+            num_dmrs_add_pos_in_slot = get_dl_dmrs_info(symbol_length, dciFormat, pdschMappingType.trim(), 2 , 1);
+        }
+        else
+        {
+            num_dmrs_add_pos_in_slot = get_dl_dmrs_info(symbol_length, dciFormat, pdschMappingType.trim(), 0 , 1);
+        }
         const ndmrs = (num_dmrs_add_pos_in_slot + 1) * NUM_CDM_GROUP * DMRS_TYPE_1_DMRS_SYMBOLS_PER_PRB;
-        
+
         const N_overhead = 6;
         const num_REs_per_prb = (pdsch_length * 12) - ndmrs - N_overhead;
-		       
+
         let data_rate;
 
-         if ((modulationScheme.trim()) == "64QAM") {
+        if ((modulationScheme.trim()) == "64QAM") {
             data_rate = calculateTransBlockQAM(num_REs_per_prb, numLayer, mcsIndex, numRb, 0);
         } else {
             data_rate = calculateTransBlockQAM(num_REs_per_prb, numLayer, mcsIndex, numRb, 1);
         }
-         allSlivTbs[i] = data_rate;
-         downlinkThroughput = (data_rate * /*(4800 - dl_slot_skip)*/ 8)/1000000; // Assuming Mbps unit
-		 allDslottpt[i] = downlinkThroughput;
-		 console.log("pverma",pdsch_length,start_symbol,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);
-		}
-		
-		downlinkThroughput = allDslottpt[0]*1600+ allDslottpt[1]*1600 + allDslottpt[2]*1600;
-		//if(numpanel == 1)
-		{
-		  dl_slot_skip += ((Math.ceil((numnb/4)))*(1000/80)); // 1 port csi-rs SLOT	
-		  console.log("1port",dl_slot_skip,downlinkThroughput);
-		  dl_slot_skip += numwb*(1000/20); //ssb slot
-		 if(numdlUecpe)
-		 {
-			dl_slot_skip += (1000/20);
-		 }
-		  console.log("ssb",dl_slot_skip);
-		  //dl_slot_skip += numwb*(1000/80); //sib1 slot
-			
-		  dl_slot_skip += numwb*(1000/20); //sib1 slot	
-			console.log("sib1",dl_slot_skip);
-        }
-        if(numpanel == 2)
-        {
-           dl_slot_skip *= 2;
-        }
-		
-		downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[0];
-		dl_slot_skip = 0;
-		dl_slot_skip = (Math.ceil((numdlUe + numdlUecpe)/4))*(1000/40); /*2 port csi-rs */
-		 console.log("2 port",dl_slot_skip,downlinkThroughput);
-		downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[1];
-		
-		downlinkThroughput = numcc*downlinkThroughput;
-
-		//console.log("pverma",numLayer,numcc,numpanel,numwb,numnb,pdschMappingType,dciFormat,dlota_or_vpal.trim(),mcsIndex,numRb,numdlUe,modulationScheme,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);	
-       
-	   // Create a table and populate it with the data
-      var table = document.createElement("table");
-      var row1 = table.insertRow();
-      var cell1 = row1.insertCell();
-      var cell2 = row1.insertCell();
-      var row2 = table.insertRow();
-      var cell3 = row2.insertCell();
-      var cell4 = row2.insertCell();
-	  var row3 = table.insertRow();
-      var cell5 = row3.insertCell();
-      var cell6 = row3.insertCell();
-	  var row4 = table.insertRow();
-      var cell7 = row4.insertCell();
-      var cell8 = row4.insertCell();
-
-      cell1.innerHTML = "Total Downlink cell Throughput";
-      cell2.innerHTML = downlinkThroughput;
-	  if((dlota_or_vpal.trim()) == "YES")
-	  {
-      cell3.innerHTML = "1st D slot tbs(sliv 1,12)";
-	  cell4.innerHTML = allSlivTbs[0];
-	  cell5.innerHTML = "2nd D slot tbs(sliv 2,11)";
-	  cell6.innerHTML = allSlivTbs[1];
-	  cell7.innerHTML = "3rd D slot tbs(sliv 1,12)";
-	  cell8.innerHTML = allSlivTbs[2];
-	  }
-	  else
-	  {
-	  cell3.innerHTML = "1st D slot tbs(sliv 1,13)";
-	  cell4.innerHTML = allSlivTbs[0];
-	  cell5.innerHTML = "2nd D slot tbs(sliv 2,12)";
-	  cell6.innerHTML = allSlivTbs[1];
-	  cell7.innerHTML = "3rd D slot tbs(sliv 1,13)";
-	  cell8.innerHTML = allSlivTbs[2];
-	  }
-   
-       row1.style.backgroundColor = "#f2f2f2"; // Set background color
-       row2.style.backgroundColor = "#e6e6e6"; // Set background color
-	   row3.style.backgroundColor = "#f2f2f2"; // Set background color
-       row4.style.backgroundColor = "#e6e6e6"; // Set background color
-       cell1.style.paddingLeft = "10px"; // Set indentation
-       cell3.style.paddingLeft = "10px"; // Set indentation
-	   cell5.style.paddingLeft = "10px"; // Set indentation
-       cell7.style.paddingLeft = "10px"; // Set indentation
-	   
-	  
-      //document.getElementById('downlinkResult').innerText = `Total Downlink cell Throughput: ${downlinkThroughput}`;
-	  
-	  var tableContainer = document.getElementById("downlinkResult");
-      tableContainer.appendChild(table);
-		
+        allSlivTbs[i] = data_rate;
+        downlinkThroughput = (data_rate * /*(4800 - dl_slot_skip)*/ 8)/1000000; // Assuming Mbps unit
+        allDslottpt[i] = downlinkThroughput;
+        console.log("pverma",pdsch_length,start_symbol,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);
     }
+
+    downlinkThroughput = allDslottpt[0]*1600+ allDslottpt[1]*1600 + allDslottpt[2]*1600;
+    //if(numpanel == 1)
+    {
+        dl_slot_skip += ((Math.ceil((numnb/4)))*(1000/80)); // 1 port csi-rs SLOT
+        console.log("1port",dl_slot_skip,downlinkThroughput);
+        dl_slot_skip += numwb*(1000/20); //ssb slot
+        console.log("ssb",dl_slot_skip);
+        //dl_slot_skip += numwb*(1000/80); //sib1 slot
+
+        dl_slot_skip += numwb*(1000/20); //sib1 slot
+        console.log("sib1",dl_slot_skip);
+    }
+    if(numpanel == 2)
+    {
+        dl_slot_skip *= 2;
+    }
+    total_dl_slot_for_pdsch -= dl_slot_skip;
 	
-    document.getElementById('downlinkForm').addEventListener('submit', function (event) {
+    downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[0];
+    dl_slot_skip = 0;
+    dl_slot_skip = (Math.ceil((numdlUe )/4))*(1000/40); /*2 port csi-rs */
+    console.log("2 port",dl_slot_skip,downlinkThroughput);
+    downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[1];
+    total_dl_slot_for_pdsch -= dl_slot_skip;
+    dl_slot_skip = 0;
+    dl_slot_skip = (Math.ceil((numdlUecpe)/4))*(1000/40); /*2 port csi-rs */
+    console.log("2 port",dl_slot_skip,downlinkThroughput);
+    downlinkThroughput = downlinkThroughput - dl_slot_skip*allDslottpt[1];
+    console.log("2 port",dl_slot_skip,downlinkThroughput);
+
+    total_dl_slot_for_pdsch -= dl_slot_skip;
+   
+    if((numdlUecpe) && (!numdlUe))
+    {
+       dl_slot_skip_ssb_muted_slot +=  (1000/80);
+       downlinkThroughput = downlinkThroughput - dl_slot_skip_ssb_muted_slot*allDslottpt[2];
+    }
+    downlinkThroughput = numcc*downlinkThroughput;
+
+    //console.log("pverma",numLayer,numcc,numpanel,numwb,numnb,pdschMappingType,dciFormat,dlota_or_vpal.trim(),mcsIndex,numRb,numdlUe,modulationScheme,num_dmrs_add_pos_in_slot,ndmrs,num_REs_per_prb,data_rate,downlinkThroughput);
+
+    // Create a table and populate it with the data
+    var table = document.createElement("table");
+    var row1 = table.insertRow();
+    var cell1 = row1.insertCell();
+    var cell2 = row1.insertCell();
+    var row2 = table.insertRow();
+    var cell3 = row2.insertCell();
+    var cell4 = row2.insertCell();
+    var row3 = table.insertRow();
+    var cell5 = row3.insertCell();
+    var cell6 = row3.insertCell();
+    var row4 = table.insertRow();
+    var cell7 = row4.insertCell();
+    var cell8 = row4.insertCell();
+
+    cell1.innerHTML = "Total Downlink cell Throughput";
+    cell2.innerHTML = downlinkThroughput;
+    if((dlota_or_vpal.trim()) == "YES")
+    {
+        cell3.innerHTML = "1st D slot tbs(sliv 1,12)";
+        cell4.innerHTML = allSlivTbs[0];
+        cell5.innerHTML = "2nd D slot tbs(sliv 2,11)";
+        cell6.innerHTML = allSlivTbs[1];
+        cell7.innerHTML = "3rd D slot tbs(sliv 1,12)";
+        cell8.innerHTML = allSlivTbs[2];
+    }
+    else
+    {
+        cell3.innerHTML = "1st D slot tbs(sliv 1,13)";
+        cell4.innerHTML = allSlivTbs[0];
+        cell5.innerHTML = "2nd D slot tbs(sliv 2,12)";
+        cell6.innerHTML = allSlivTbs[1];
+        cell7.innerHTML = "3rd D slot tbs(sliv 1,13)";
+        cell8.innerHTML = allSlivTbs[2];
+    }
+
+    row1.style.backgroundColor = "#f2f2f2"; // Set background color
+    row2.style.backgroundColor = "#e6e6e6"; // Set background color
+    row3.style.backgroundColor = "#f2f2f2"; // Set background color
+    row4.style.backgroundColor = "#e6e6e6"; // Set background color
+    cell1.style.paddingLeft = "10px"; // Set indentation
+    cell3.style.paddingLeft = "10px"; // Set indentation
+    cell5.style.paddingLeft = "10px"; // Set indentation
+    cell7.style.paddingLeft = "10px"; // Set indentation
+
+
+    //document.getElementById('downlinkResult').innerText = `Total Downlink cell Throughput: ${downlinkThroughput}`;
+
+    var tableContainer = document.getElementById("downlinkResult");
+    tableContainer.appendChild(table);
+
+}
+
+	
+     document.getElementById('downlinkForm').addEventListener('submit', function (event) 
+    {
       event.preventDefault();
       calculateDownlinkThroughput();
     });
